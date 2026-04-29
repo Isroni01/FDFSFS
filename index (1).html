@@ -495,7 +495,7 @@
       <li><a href="#monitoring">Monitoring</a></li>
       <li><a href="#" id="kelolaAsetLink">Kelola Aset</a></li>
       <li><a href="#" id="inputAsetLink">Input Aset</a></li>
-      <li><a href="#" id="requestPerbaikanLink">Permohonan Perbaikan</a></li>
+      <li><a href="#" id="requestPerbaikanLink">Request Perbaikan</a></li>
     </ul>
   </nav>
 
@@ -514,7 +514,7 @@
         <li><a class="mobile-link" href="#monitoring"><i class="fas fa-chart-pie"></i> Monitoring</a></li>
         <li><a class="mobile-link" href="#" id="mobileKelolaAsetLink"><i class="fas fa-box-archive"></i> Kelola Aset</a></li>
         <li><a class="mobile-link" href="#" id="mobileInputAsetLink"><i class="fas fa-pen-to-square"></i> Input Aset</a></li>
-        <li><a class="mobile-link" href="#" id="mobileRequestPerbaikanLink"><i class="fas fa-wrench"></i> Permohonan Perbaikan</a></li>
+        <li><a class="mobile-link" href="#" id="mobileRequestPerbaikanLink"><i class="fas fa-wrench"></i> Request Perbaikan</a></li>
         <li><a class="mobile-link" href="#riwayat"><i class="fas fa-clock-rotate-left"></i> Riwayat</a></li>
       </ul>
     </div>
@@ -536,7 +536,7 @@
 
   <section class="monitoring" id="monitoring">
     <h2>Monitoring Aset</h2>
-    <p>Pantauan ringkas kondisi aset.</p>
+    <p>Pantauan ringkas kondisi aset: total, baik, sedang diperbaiki, dan rusak.</p>
 
     <div class="monitoring-wrap">
       <div class="chart-card">
@@ -714,7 +714,7 @@
 
   <!-- Riwayat Laporan -->
   <section class="reports" id="riwayat">
-    <h2>Riwayat Laporan Perbaikan</h2>
+    <h2>Riwayat Laporan Request Perbaikan</h2>
     <div class="table-wrap">
       <table id="reportsTable">
         <thead>
@@ -748,7 +748,7 @@
     <div class="footer-content">
       <div class="footer-section">
         <h4>Rutan Kelas IIB Pandeglang</h4>
-        <p>Jl. Masjid Agung Pandeglang, Kec. Pandeglang, Kabupaten Pandeglang, Banten 42211. </p>
+        <p>Jl. Raya Serang No. 02, Kadumerak, Karang Tanjung, Kabupaten Pandeglang, Banten 42211.</p>
       </div>
       <div class="footer-section">
         <h4>Slogan Pelayanan</h4>
@@ -766,11 +766,11 @@
     </div>
   </footer>
 
-  <!-- Modal Permohonan Perbaikan -->
+  <!-- Modal Request Perbaikan -->
   <div class="modal-overlay" id="requestModalOverlay" aria-hidden="true">
     <div class="modal" role="dialog" aria-modal="true" aria-labelledby="requestModalTitle">
       <div class="modal-header">
-        <h3 id="requestModalTitle"><i class="fas fa-wrench"></i> Form Permohonan Perbaikan Aset</h3>
+        <h3 id="requestModalTitle"><i class="fas fa-wrench"></i> Form Request Perbaikan Aset</h3>
         <button class="modal-close" id="requestModalCloseBtn" aria-label="Tutup">
           <i class="fas fa-times"></i>
         </button>
@@ -811,9 +811,6 @@
                 <img id="fotoPreviewImg" alt="Preview foto aset" />
                 <small>Preview foto yang dipilih.</small>
               </div>
-              <small style="color:#64748b;font-weight:700;">
-                Tips: Foto akan dikompres otomatis agar laporan bisa dikirim berkali-kali.
-              </small>
             </div>
 
             <div class="form-group full">
@@ -824,7 +821,7 @@
 
           <div class="modal-footer">
             <button type="button" class="btn-secondary" id="requestModalCancelBtn">Batal</button>
-            <button type="submit" class="btn-primary" id="requestSubmitBtn">Kirim Request</button>
+            <button type="submit" class="btn-primary">Kirim Request</button>
           </div>
         </form>
       </div>
@@ -879,7 +876,7 @@
     // =========================================================
     // CONFIG (PENTING)
     // =========================================================
-    const ASSET_API_URL = "https://script.google.com/macros/s/AKfycbzRYw63EFeuYD9gVIjRQROePqqI5YN4o0R5WL7eRI7W7NZQaSxUZlqWxXSqMxdEmooo/exec";
+    const ASSET_API_URL = "https://script.google.com/macros/s/AKfycbx8f7gJcLTWF09eX7VLz4I7EmmL-kOjdA3GrBHW31B8VhQjnOGqc0b0oaM-UcxIDzXWdg/exec";
 
     // Admin UI (login client)
     const ADMIN_LOGIN_EMAIL = "sinatriarupa@gmail.com";
@@ -934,7 +931,7 @@
       }
     }
 
-    // Status helpers (Permohonan Perbaikan)
+    // Status helpers (Request Perbaikan)
     function getStatusClass(status) {
       const s = String(status || "").toLowerCase();
       if (s === "dilaporkan") return "status-dilaporkan";
@@ -1117,14 +1114,13 @@
     });
 
     // =========================================================
-    // MODAL PERMOHONAN PERBAIKAN
+    // MODAL REQUEST PERBAIKAN
     // =========================================================
     const requestLink = document.getElementById("requestPerbaikanLink");
     const requestOverlay = document.getElementById("requestModalOverlay");
     const requestCloseBtn = document.getElementById("requestModalCloseBtn");
     const requestCancelBtn = document.getElementById("requestModalCancelBtn");
     const requestForm = document.getElementById("requestPerbaikanForm");
-    const requestSubmitBtn = document.getElementById("requestSubmitBtn");
     const fotoInput = document.getElementById("fotoAset");
     const previewWrap = document.getElementById("fotoPreview");
     const previewImg = document.getElementById("fotoPreviewImg");
@@ -1507,21 +1503,8 @@
       }
     }
 
-    // === UPDATED: saveReports with error handling ===
     function saveReports(reports) {
-      try {
-        localStorage.setItem(REPORTS_STORAGE_KEY, JSON.stringify(reports));
-      } catch (e) {
-        alert(
-          "Gagal menyimpan laporan (penyimpanan perangkat penuh / dibatasi).\n\n" +
-          "Solusi:\n" +
-          "- Coba foto yang lebih kecil\n" +
-          "- Hapus riwayat laporan (admin)\n" +
-          "- Gunakan browser lain / non-incognito\n\n" +
-          "Detail: " + String(e)
-        );
-        throw e;
-      }
+      localStorage.setItem(REPORTS_STORAGE_KEY, JSON.stringify(reports));
     }
 
     function formatDateTime(dt) {
@@ -1701,7 +1684,7 @@
     });
 
     // =========================================================
-    // EmailJS notify (opsional)
+    // EmailJS notify (opsional, tetap ada seperti kode awal)
     // =========================================================
     async function notifyEmail(report) {
       try {
@@ -1721,35 +1704,6 @@
       }
     }
 
-    // === NEW: compress image to smaller dataURL (reduce storage usage) ===
-    async function fileToCompressedDataUrl(file, {
-      maxW = 1280,
-      maxH = 1280,
-      quality = 0.7,
-      mime = "image/jpeg"
-    } = {}) {
-      // Fallback if createImageBitmap unsupported
-      const canUse = typeof createImageBitmap === "function";
-      if (!canUse) {
-        // fallback to original (still may be large)
-        return await fileToDataUrl(file);
-      }
-
-      const bmp = await createImageBitmap(file);
-      const ratio = Math.min(maxW / bmp.width, maxH / bmp.height, 1);
-      const w = Math.max(1, Math.round(bmp.width * ratio));
-      const h = Math.max(1, Math.round(bmp.height * ratio));
-
-      const canvas = document.createElement("canvas");
-      canvas.width = w;
-      canvas.height = h;
-
-      const ctx = canvas.getContext("2d");
-      ctx.drawImage(bmp, 0, 0, w, h);
-
-      return canvas.toDataURL(mime, quality);
-    }
-
     function fileToDataUrl(file) {
       return new Promise((resolve, reject) => {
         const reader = new FileReader();
@@ -1759,64 +1713,38 @@
       });
     }
 
-    // Submit Permohonan Perbaikan (status default: Dilaporkan)
+    // Submit Request Perbaikan (status default: Dilaporkan)
     requestForm.addEventListener("submit", async (e) => {
       e.preventDefault();
 
-      // UI lock to avoid double submit
-      requestSubmitBtn.disabled = true;
-      const oldBtnText = requestSubmitBtn.textContent;
-      requestSubmitBtn.textContent = "Mengirim...";
+      const data = new FormData(requestForm);
+      const file = fotoInput.files && fotoInput.files[0];
 
-      try {
-        const data = new FormData(requestForm);
-        const file = fotoInput.files && fotoInput.files[0];
+      const report = {
+        tanggal: formatDateTime(new Date()),
+        namaPemohon: String(data.get("namaPemohon") || ""),
+        namaAset: String(data.get("namaAset") || ""),
+        lokasiAset: String(data.get("lokasiAset") || ""),
+        tingkat: String(data.get("tingkatKerusakan") || ""),
+        status: "Dilaporkan",
+        deskripsi: String(data.get("deskripsiKerusakan") || ""),
+        fotoDataUrl: ""
+      };
 
-        const report = {
-          tanggal: formatDateTime(new Date()),
-          namaPemohon: String(data.get("namaPemohon") || ""),
-          namaAset: String(data.get("namaAset") || ""),
-          lokasiAset: String(data.get("lokasiAset") || ""),
-          tingkat: String(data.get("tingkatKerusakan") || ""),
-          status: "Dilaporkan",
-          deskripsi: String(data.get("deskripsiKerusakan") || ""),
-          fotoDataUrl: ""
-        };
+      if (file) report.fotoDataUrl = await fileToDataUrl(file);
 
-        if (file) {
-          // compress to reduce storage usage
-          report.fotoDataUrl = await fileToCompressedDataUrl(file, {
-            maxW: 1280,
-            maxH: 1280,
-            quality: 0.7,
-            mime: "image/jpeg"
-          });
-        }
+      const reports = loadReports();
+      reports.unshift(report);
+      saveReports(reports);
+      renderReports();
 
-        const reports = loadReports();
-        reports.unshift(report);
-        saveReports(reports); // will throw with alert if quota/blocked
-        renderReports();
+      requestForm.reset();
+      previewWrap.classList.remove("show");
+      previewImg.removeAttribute("src");
+      closeRequestModal();
 
-        requestForm.reset();
-        previewWrap.classList.remove("show");
-        previewImg.removeAttribute("src");
-        closeRequestModal();
-
-        // notif email (opsional)
-        await notifyEmail(report);
-
-      } catch (err) {
-        console.error("Submit report error:", err);
-        // alert sudah dari saveReports jika gagal di storage,
-        // tapi kalau gagal di tempat lain, tampilkan pesan umum:
-        if (!String(err || "").includes("QuotaExceeded")) {
-          alert("Terjadi error saat mengirim request. Silakan coba lagi.\n\nDetail: " + String(err));
-        }
-      } finally {
-        requestSubmitBtn.disabled = false;
-        requestSubmitBtn.textContent = oldBtnText || "Kirim Request";
-      }
+      // notif email (opsional)
+      await notifyEmail(report);
     });
 
     // =========================================================
